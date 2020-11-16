@@ -6,7 +6,7 @@ function SignUp(props) {
       <Head>
         <title>AlphaMartian - Sign Up</title>
       </Head>
-      SignUp Page
+      SignUp Page Here
     </div>
   )
 }
