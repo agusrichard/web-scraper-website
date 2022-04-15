@@ -1,8 +1,15 @@
 {
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
     "python.linting.enabled": true,
     "python.linting.pylintEnabled": true,
     "editor.codeActionsOnSave": {
         "source.fixAll.pylint": true
-    }
+    },
+    "[python]": {
+        "editor.formatOnSave": true
+    },
+    "[html]": {
+        "editor.formatOnSave": false,
+        "editor.tabSize": 2
+    },
 }
