@@ -1,7 +1,7 @@
 from time import time
 from celery import Celery
 
-worker = Celery(__name__, broker='redis://localhost:6379/0')
+worker = Celery(__name__, broker='redis://redis:6379/0')
 
 @worker.task(name='create_task')
 def create_task(task_name):
