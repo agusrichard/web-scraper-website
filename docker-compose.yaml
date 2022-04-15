@@ -16,6 +16,7 @@ services:
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
       - DB_NAME=${DB_NAME}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
     depends_on:
       - db
   db:
@@ -35,18 +36,20 @@ services:
   redis:
     container_name: redis
     image: redis:6.2-alpine
-  # celery_worker:
-  #   container_name: celery_worker
-  #   build: .
-  #   command: celery -A celery_worker.celery worker --loglevel=info
-  #   volumes:
-  #     - .:/app
-  #   environment:
-  #     - CELERY_BROKER_URL=${CELERY_BROKER_URL}
-  #     - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
-  #   depends_on:
-  #     - app
-  #     - redis
+  celery_worker:
+    container_name: celery_worker
+    build: .
+    command: celery -A core worker -l INFO
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+    depends_on:
+      - app
+      - redis
 volumes:
   db:
     driver: local
