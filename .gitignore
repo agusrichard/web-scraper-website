@@ -1,3 +1,4 @@
 venv
 .env
 driver
+__pycache__
