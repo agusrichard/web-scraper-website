@@ -18,7 +18,7 @@ class ScrappingHistory(models.Model):
 
 
 class Article(models.Model):
-    title = models.CharField(max_length=500)
+    title = models.CharField(max_length=500, unique=True)
     subtitle = models.TextField()
     author = models.CharField(max_length=100)
     image_src = models.TextField()

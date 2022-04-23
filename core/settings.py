@@ -132,5 +132,6 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Celery settings
+# Additional settings
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
+SCRAPE_URL = os.getenv("SCRAPE_URL")

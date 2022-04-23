@@ -1,8 +1,8 @@
 from django.shortcuts import render
 
-from .tasks import add
+from .tasks import scrape_website
 
-# Create your views here.
+
 def home(request):
-    add.delay(1, 2)
+    scrape_website.delay()
     return render(request, "website/home.html", {"page_title": "Home"})
