@@ -1,7 +1,7 @@
 import time
 from datetime import datetime
-from selenium import webdriver
 from django.db.utils import IntegrityError
+from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 
@@ -59,6 +59,8 @@ class Scraper(webdriver.Chrome):
         imgs = section.find_elements(by=By.CSS_SELECTOR, value="img")
         if len(imgs) > 1:
             img = imgs[1].get_attribute("src")
+
+        print("date", date)
 
         data = {
             "title": title,
