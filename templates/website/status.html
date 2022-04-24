@@ -1,0 +1,9 @@
+{% if status == 0 %}
+  <td>Pending</td>
+{% elif status == 1 %}
+  <td>In Progress</td>
+{% elif status == 2 %}
+  <td>Completed</td>
+{% else %}
+  <td>Failed</td>
+{% endif %}
