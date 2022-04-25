@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "website",
+    "django_crontab",
 ]
 
 MIDDLEWARE = [
@@ -135,3 +136,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Additional settings
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
 SCRAPE_URL = os.getenv("SCRAPE_URL")
+CRONJOBS = [
+    ("* * * * *", "website.cron.print_sekar"),
+    ("* * * * *", "website.cron.scrape_website"),
+]
