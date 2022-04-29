@@ -1,11 +1,12 @@
 import time
 from datetime import datetime
+from django.utils import timezone as tz
 from django.db.utils import IntegrityError
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 
-from website.models import Article, ScrappingHistory
+from website.models import Article, ScrapingHistory
 
 BASE_URL = "https://medium.com/search?q=programming"
 
@@ -17,13 +18,13 @@ class Scraper(webdriver.Chrome):
         self.result = dict()
         self.url = url
 
-        scraping_history = ScrappingHistory(status=1)
+        scraping_history = ScrapingHistory(status=1)
         scraping_history.save()
         self.scraping_history = scraping_history
 
     def __exit__(self, *args):
         print("self.result", self.result)
-        self.scraping_history.end_datetime = datetime.now()
+        self.scraping_history.end_datetime = tz.now()
         self.scraping_history.status = 2
         self.scraping_history.save()
         self.quit()

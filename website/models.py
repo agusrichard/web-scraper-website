@@ -1,6 +1,6 @@
 from django.db import models
 
-SCRAPPING_STATUSES = (
+SCRAPING_STATUSES = (
     (0, "Pending"),
     (1, "In Progress"),
     (2, "Completed"),
@@ -8,10 +8,10 @@ SCRAPPING_STATUSES = (
 )
 
 
-class ScrappingHistory(models.Model):
+class ScrapingHistory(models.Model):
     start_datetime = models.DateTimeField(auto_now_add=True)
     end_datetime = models.DateTimeField(null=True, blank=True)
-    status = models.IntegerField(choices=SCRAPPING_STATUSES, default=0)
+    status = models.IntegerField(choices=SCRAPING_STATUSES, default=0)
 
     def __str__(self):
         return str(self.status)
@@ -25,7 +25,7 @@ class Article(models.Model):
     url = models.TextField()
     published_date = models.DateTimeField()
     created_date = models.DateTimeField(auto_now_add=True)
-    scrapping_history = models.ForeignKey(ScrappingHistory, on_delete=models.CASCADE)
+    scraping_history = models.ForeignKey(ScrapingHistory, on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.title)

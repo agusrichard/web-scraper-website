@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 
 from .tasks import scrape_website
-from .models import ScrappingHistory
+from .models import ScrapingHistory
 
 
 def home(request):
@@ -9,7 +9,7 @@ def home(request):
 
 
 def scraping_history(request):
-    histories = ScrappingHistory.objects.all()
+    histories = ScrapingHistory.objects.all()
 
     return render(request, "website/scraping_history.html", {"histories": histories})
 
