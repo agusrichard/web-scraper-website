@@ -11,11 +11,17 @@ def home(request):
 def scraping_history(request):
     histories = ScrapingHistory.objects.all()
 
-    return render(request, "website/scraping_history.html", {"histories": histories})
+    return render(
+        request,
+        "website/scraping_history.html",
+        {"histories": histories, "page_title": "Scraping History"},
+    )
 
 
 def run_manual_scraping(request):
     if request.method == "POST":
-        scrape_website.delay()
+        sh = ScrapingHistory(status=1)
+        sh.save()
+        scrape_website.delay(sh.id)
 
     return redirect("website:scraping_history")

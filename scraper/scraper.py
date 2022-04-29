@@ -5,25 +5,23 @@ from django.db.utils import IntegrityError
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import (
+    NoSuchElementException,
+    ElementClickInterceptedException,
+)
 
 from website.models import Article, ScrapingHistory
 
-BASE_URL = "https://medium.com/search?q=programming"
-
 
 class Scraper(webdriver.Chrome):
-    def __init__(self, url: str):
+    def __init__(self, url: str, scraping_history_id: int):
         super().__init__(chrome_options=self.set_chrome_options())
-
-        self.result = dict()
         self.url = url
 
-        scraping_history = ScrapingHistory(status=1)
-        scraping_history.save()
+        scraping_history = ScrapingHistory.objects.get(id=scraping_history_id)
         self.scraping_history = scraping_history
 
     def __exit__(self, *args):
-        print("self.result", self.result)
         self.scraping_history.end_datetime = tz.now()
         self.scraping_history.status = 2
         self.scraping_history.save()
@@ -46,6 +44,7 @@ class Scraper(webdriver.Chrome):
     def get_elements(self, section):
         date = ""
         img = ""
+        published_date = tz.now()
 
         title = section.find_element(by=By.CSS_SELECTOR, value="h2").text.strip()
         author = section.find_element(
@@ -55,21 +54,29 @@ class Scraper(webdriver.Chrome):
             by=By.CSS_SELECTOR, value='a[aria-label="Post Preview Title"]'
         ).get_attribute("href")
         spans = section.find_elements(by=By.CSS_SELECTOR, value="p.bn.bo.bp.co span")
+
         if len(spans) > 1:
             date = spans[1].text.strip()
         imgs = section.find_elements(by=By.CSS_SELECTOR, value="img")
         if len(imgs) > 1:
             img = imgs[1].get_attribute("src")
 
-        print("date", date)
+        # TODO: This is a godawful code. Refactor this later
+        if date != "":
+            try:
+                published_date = datetime.strptime(date, "%b %d, %Y")
+            except ValueError:
+                published_date = datetime.strptime(
+                    f"{date}, {tz.now().year}", "%b %d, %Y"
+                )
 
         data = {
             "title": title,
             "author": author,
-            "published_date": datetime.strptime(date, "%b %d, %Y"),
+            "published_date": published_date,
             "url": url,
             "image_src": img,
-            "scrapping_history": self.scraping_history,
+            "scraping_history": self.scraping_history,
         }
 
         return data
@@ -85,31 +92,34 @@ class Scraper(webdriver.Chrome):
             except IntegrityError:
                 continue
 
-    def scroll_down(self, sleep_time=3, num_scrolls=10):
+    def scroll_down(self, sleep_time=5, num_scrolls=50):
+        counter = 0
         last_height = self.execute_script("return document.body.scrollHeight")
 
         for _ in range(num_scrolls):
             self.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-
             time.sleep(sleep_time)
             self.get_article_section()
-            self.find_element(
-                by=By.XPATH, value="//*[contains(text(), 'Show more')]"
-            ).click()
+
+            try:
+                self.find_element(
+                    by=By.XPATH, value="//*[contains(text(), 'Show more')]"
+                ).click()
+            except NoSuchElementException:
+                continue
+            except ElementClickInterceptedException:
+                continue
 
             new_height = self.execute_script("return document.body.scrollHeight")
 
-            if new_height == last_height:
+            if counter >= 2 and new_height == last_height:
                 break
+            counter += 1
 
+            if new_height != last_height:
+                counter = 0
             last_height = new_height
 
 
-def make_scraper(url: str):
-    return Scraper(url)
-
-
-if __name__ == "__main__":
-    with Scraper(BASE_URL) as scraper:
-        scraper.go_to_first_page()
-        scraper.scroll_down()
+def make_scraper(url: str, scraping_history_id: int):
+    return Scraper(url, scraping_history_id)

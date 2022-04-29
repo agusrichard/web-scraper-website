@@ -17,10 +17,10 @@
     <table class="table table-striped table-hover">
       <thead>
         <tr class="table-primary">
-          <th scope="col">#</th>
-          <th scope="col">Start</th>
-          <th scope="col">End</th>
-          <th scope="col">Status</th>
+          <th scope="col" style="width: 5%">#</th>
+          <th scope="col" style="width: 35%">Start</th>
+          <th scope="col" style="width: 35%">End</th>
+          <th scope="col" style="width: 20%">Status</th>
         </tr>
       </thead>
       <tbody>
@@ -30,6 +30,10 @@
             <td>{{ history.start_datetime }}</td>
             <td>{{ history.end_datetime }}</td>
             {% include 'website/status.html' with status=history.status %}
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="4" class="text-center">No scraping history</td>
           </tr>
         {% endfor %}
       </tbody>
