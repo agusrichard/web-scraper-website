@@ -6,15 +6,21 @@
     {% for article in articles %}
       <section class="card mt-2 mb-2 article-section">
         <a href="{{ article.url }}" target="_blank">
-          <div class="card-body">
-            <h5 class="card-title">{{ article.title }}</h5>
-            <p class="card-text">{{ article.author }}</p>
-            <p class="card-text"><small class="text-muted">{{ article.published_date|date }}</small></p>
+          <div class="card-body article-card-body">
+            <div>
+              <p class="card-text"><small class="text-muted scraped-date">{{ article.created_date|date }}</small></p>
+              <h5 class="card-title">{{ article.title }}</h5>
+              <p class="card-text">{{ article.author }}</p>
+              <p class="card-text"><small class="text-muted">Published date: {{ article.published_date|date }}</small></p>
+            </div>
+            <div class="article-card-img-container">
+              <img src="{% if article.image_src %}{{ article.image_src }}{% else %}https://via.placeholder.com/112{% endif %}" alt="{{ article.title }}" />
+            </div>
           </div>
         </a>
       </section>
     {% empty %}
-      <p>No articles found</p>
+      <h5 class="no-articles">No articles found</h5>
     {% endfor %}
   </div>
   {% include 'website/pagination.html' with data=articles url_name="website:home" %}
