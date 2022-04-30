@@ -17,5 +17,5 @@
       <p>No articles found</p>
     {% endfor %}
   </div>
-  {% include 'website/pagination.html' with data=articles %}
+  {% include 'website/pagination.html' with data=articles url_name="website:home" %}
 {% endblock content %}
