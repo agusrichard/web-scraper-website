@@ -61,6 +61,10 @@ class Scraper(webdriver.Chrome):
         if len(imgs) > 1:
             img = imgs[1].get_attribute("src")
 
+        index_url_search_post = url.find("?source=search_post")
+        if index_url_search_post != -1:
+            url = url[:index_url_search_post]
+
         # TODO: This is a godawful code. Refactor this later
         if date != "":
             try:
