@@ -20,3 +20,34 @@ section.article-section a {
   color: #000;
   text-decoration: none;
 }
+
+.no-articles {
+  color: #999;
+  font-size: 1rem;
+  margin-top: 50px;
+  text-align: center;
+}
+
+.no-scraping-history {
+  text-align: center;
+  color: #666 !important;
+}
+
+.article-card-body {
+  display: flex;;
+  justify-content: space-between;
+}
+
+.scraped-date {
+  color: #999;
+  font-size: 0.8rem;
+}
+
+.article-card-img {
+  padding-top: 10px;
+}
+
+.article-card-img-container {
+  display: flex;
+  align-items: center;
+}
