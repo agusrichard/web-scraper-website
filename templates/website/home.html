@@ -1,5 +1,21 @@
 {% extends 'website/base.html' %}
 
 {% block content %}
-  <h1 class="title">Hello World</h1>
+  <div class="mt-4 mb-3">
+    <h2 class="text-center mb-3">List of Articles</h2>
+    {% for article in articles %}
+      <section class="card mt-2 mb-2 article-section">
+        <a href="{{ article.url }}" target="_blank">
+          <div class="card-body">
+            <h5 class="card-title">{{ article.title }}</h5>
+            <p class="card-text">{{ article.author }}</p>
+            <p class="card-text"><small class="text-muted">{{ article.published_date|date }}</small></p>
+          </div>
+        </a>
+      </section>
+    {% empty %}
+      <p>No articles found</p>
+    {% endfor %}
+  </div>
+  {% include 'website/pagination.html' with data=articles %}
 {% endblock content %}
