@@ -11,8 +11,4 @@ DB_PORT=5432
 CELERY_BROKER_URL=
 CELERY_BROKER_URL=redis://redis:6379/0
 CELERY_RESULT_BACKEND=redis://redis:6379/0
-SCRAPE_URL=https://medium.com/search?q=programming
-
-## To-do list:
-
--
+SCRAPE_URL=https://medium.com/search?q=programmin

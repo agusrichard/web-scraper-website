@@ -15,3 +15,8 @@ a.scraping-history-link {
 h1.scraping-history-title {
   font-size: 2rem;
 }
+
+section.article-section a {
+  color: #000;
+  text-decoration: none;
+}
