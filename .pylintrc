@@ -6,3 +6,4 @@ disable=
     E1101, # no-member
     C0415, # import outside top-level package
     c0103, # invalid-name
+    W0703, # broad-except

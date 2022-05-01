@@ -1,17 +1,12 @@
 from django.db import models
 
-SCRAPING_STATUSES = (
-    (0, "Pending"),
-    (1, "In Progress"),
-    (2, "Completed"),
-    (3, "Failed"),
-)
+from .common import ScrapingStatuses
 
 
 class ScrapingHistory(models.Model):
     start_datetime = models.DateTimeField(auto_now_add=True)
     end_datetime = models.DateTimeField(null=True, blank=True)
-    status = models.IntegerField(choices=SCRAPING_STATUSES, default=0)
+    status = models.IntegerField(choices=ScrapingStatuses.choices, default=0)
 
     def __str__(self):
         return str(self.status)

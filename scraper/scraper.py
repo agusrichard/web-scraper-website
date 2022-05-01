@@ -7,9 +7,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import (
     NoSuchElementException,
+    StaleElementReferenceException,
     ElementClickInterceptedException,
 )
 
+from website.common import ScrapingStatuses
 from website.models import Article, ScrapingHistory
 
 
@@ -17,13 +19,17 @@ class Scraper(webdriver.Chrome):
     def __init__(self, url: str, scraping_history_id: int):
         super().__init__(chrome_options=self.set_chrome_options())
         self.url = url
+        self.error = None
 
         scraping_history = ScrapingHistory.objects.get(id=scraping_history_id)
         self.scraping_history = scraping_history
 
     def __exit__(self, *args):
         self.scraping_history.end_datetime = tz.now()
-        self.scraping_history.status = 2
+        if self.error:
+            self.scraping_history.status = ScrapingStatuses.FAILED
+        else:
+            self.scraping_history.status = ScrapingStatuses.COMPLETED
         self.scraping_history.save()
         self.quit()
 
@@ -32,6 +38,7 @@ class Scraper(webdriver.Chrome):
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
+
         chrome_prefs = {}
         chrome_options.experimental_options["prefs"] = chrome_prefs
         chrome_prefs["profile.default_content_settings"] = {"images": 2}
@@ -42,9 +49,7 @@ class Scraper(webdriver.Chrome):
         self.get(self.url)
 
     def get_elements(self, section):
-        date = ""
-        img = ""
-        published_date = tz.now()
+        date, img, published_date = "", "", tz.now()
 
         title = section.find_element(by=By.CSS_SELECTOR, value="h2").text.strip()
         author = section.find_element(
@@ -53,19 +58,19 @@ class Scraper(webdriver.Chrome):
         url = section.find_element(
             by=By.CSS_SELECTOR, value='a[aria-label="Post Preview Title"]'
         ).get_attribute("href")
-        spans = section.find_elements(by=By.CSS_SELECTOR, value="p.bn.bo.bp.co span")
 
+        spans = section.find_elements(by=By.CSS_SELECTOR, value="p.bn.bo.bp.co span")
         if len(spans) > 1:
             date = spans[1].text.strip()
         imgs = section.find_elements(by=By.CSS_SELECTOR, value="img")
         if len(imgs) > 1:
             img = imgs[1].get_attribute("src")
 
+        # Updates url if it is a relative url, removing source query params
         index_url_search_post = url.find("?source=search_post")
         if index_url_search_post != -1:
             url = url[:index_url_search_post]
 
-        # TODO: This is a godawful code. Refactor this later
         if date != "":
             try:
                 published_date = datetime.strptime(date, "%b %d, %Y")
@@ -87,6 +92,7 @@ class Scraper(webdriver.Chrome):
 
     def get_article_section(self):
         sections = self.find_elements(by=By.CSS_SELECTOR, value="article")
+
         for section in sections:
             data = self.get_elements(section)
 
@@ -102,20 +108,27 @@ class Scraper(webdriver.Chrome):
 
         for _ in range(num_scrolls):
             self.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
             time.sleep(sleep_time)
-            self.get_article_section()
 
             try:
                 self.find_element(
                     by=By.XPATH, value="//*[contains(text(), 'Show more')]"
                 ).click()
+                self.get_article_section()
             except NoSuchElementException:
                 continue
             except ElementClickInterceptedException:
                 continue
+            except StaleElementReferenceException:
+                continue
+            except Exception as e:
+                self.error = e
+                return
 
             new_height = self.execute_script("return document.body.scrollHeight")
 
+            # If the infinite scroll is stopped, then break. Also using counter to adjust to the real behavior
             if counter >= 2 and new_height == last_height:
                 break
             counter += 1
