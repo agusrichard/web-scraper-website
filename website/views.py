@@ -9,12 +9,14 @@ def home(request):
     data = Article.objects.all().order_by("-created_date")
     page = request.GET.get("page", 1)
 
+    page_range = None
     paginator = Paginator(data, 20)
-    page_range = paginator.get_elided_page_range(number=page)
     try:
         page_list = paginator.page(page)
+        page_range = paginator.get_elided_page_range(number=page)
     except PageNotAnInteger:
         page_list = paginator.page(1)
+        page_range = paginator.get_elided_page_range(number=1)
     except EmptyPage:
         page_list = paginator.page(paginator.num_pages)
     return render(
