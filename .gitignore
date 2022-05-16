@@ -4,3 +4,4 @@ driver
 __pycache__
 db.sqlite3
 htmlcov
+celerybeat-schedule

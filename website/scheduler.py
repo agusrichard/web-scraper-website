@@ -1,11 +1,15 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 
-from .tasks import scrape_website
+from .tasks import scrape_website_background
+from .models import ScrapingHistory
 
 
 def scraping_scheduler():
     print("Scraping....")
-    scrape_website.delay()
+
+    sh = ScrapingHistory(status=1)
+    sh.save()
+    scrape_website_background.delay(sh.id)
 
 
 def start():

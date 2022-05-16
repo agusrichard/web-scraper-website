@@ -33,7 +33,8 @@ class Scraper(webdriver.Chrome):
         self.scraping_history.save()
         self.quit()
 
-    def set_chrome_options(self) -> None:
+    @classmethod
+    def set_chrome_options(cls) -> None:
         chrome_options = Options()
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--no-sandbox")

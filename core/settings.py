@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "website",
+    "django_celery_beat",
 ]
 
 MIDDLEWARE = [
@@ -133,5 +135,12 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Additional settings
-CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
 SCRAPE_URL = os.getenv("SCRAPE_URL")
+SCRAPE_NUM_OF_SCROLLS = int(os.getenv("SCRAPE_NUM_OF_SCROLLS"))
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
+CELERY_BEAT_SCHEDULE = {
+    "scheduled_task": {
+        "task": "website.tasks.scrape_website_background",
+        "schedule": crontab(minute=0, hour=0, day_of_week=1),
+    },
+}
