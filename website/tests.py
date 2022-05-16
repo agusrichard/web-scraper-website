@@ -102,7 +102,7 @@ class TestMocked(TestCase):
             mock.Mock()
         )
 
-        scrape_website(1)
+        scrape_website()
 
         mocked_make_scraper.return_value.__enter__.return_value.go_to_first_page.assert_called_once()
         mocked_make_scraper.return_value.__enter__.return_value.scroll_down.assert_called_once()

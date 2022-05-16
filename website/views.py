@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from .tasks import scrape_website
+from .tasks import scrape_website_manual
 from .models import ScrapingHistory, Article
 
 
@@ -53,6 +53,6 @@ def run_manual_scraping(request):
     if request.method == "POST":
         sh = ScrapingHistory(status=1)
         sh.save()
-        scrape_website.delay(sh.id)
+        scrape_website_manual.delay(sh.id)
 
     return redirect("website:scraping_history")

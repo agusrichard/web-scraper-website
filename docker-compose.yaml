@@ -38,9 +38,21 @@ services:
     container_name: redis
     image: redis:6.2-alpine
   celery_worker:
-    container_name: celery_worker
     build: .
     command: celery -A core worker -l INFO
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+    depends_on:
+      - app
+      - redis
+  celery_beat:
+    build: .
+    command: celery -A core beat -l info
     volumes:
       - .:/app
     env_file:
